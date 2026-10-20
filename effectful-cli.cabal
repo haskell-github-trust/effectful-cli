@@ -7,7 +7,7 @@ cabal-version: 1.12
 name:           effectful-cli
 version:        0.1.0.0
 synopsis:       CLI helpers for the effectful ecosystem
-description:    Please see the README.
+description:    Please see the README at https://github.com/haskell-github-trust/effectful-cli.
 category:       CLI
 author:         drlkf
 maintainer:     drlkf <drlkf@drlkf.net>
