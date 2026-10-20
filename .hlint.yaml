@@ -1,0 +1,1 @@
+- warn: {lhs: map, rhs: fmap, name: Use fmap}

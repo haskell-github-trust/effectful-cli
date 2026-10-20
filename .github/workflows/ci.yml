@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: haskell-actions/run-fourmolu@v13
+        with:
+          version: 0.21.0.0
+          pattern: |
+            src/**/*.hs
+            test/**/*.hs
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: haskell-actions/hlint-setup@v2
+        with:
+          version: "3.10"
+
+      - uses: haskell-actions/hlint-run@v2
+        with:
+          path: '["src/", "test/"]'
+          fail-on: warning
+
+  build-test:
+    name: build-test (${{ matrix.os }}, ${{ matrix.ghc }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+
+        ghc:
+          - 9.10.3
+          - 9.12.4
+
+        include:
+          - ghc: 9.10.3
+            stack-yaml: stack.yaml
+
+          - ghc: 9.12.4
+            stack-yaml: stack-ghc-9.12.yaml
+
+    env:
+      STACK_YAML: ${{ matrix.stack-yaml }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: haskell-actions/setup@v2
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          enable-stack: true
+          stack-version: latest
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.stack
+          key: stack-${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles(matrix.stack-yaml, format('{0}.lock', matrix.stack-yaml), 'package.yaml') }}
+          restore-keys: stack-${{ runner.os }}-${{ matrix.ghc }}-
+
+      - name: Build
+        run: stack build --test --no-run-tests --system-ghc --ghc-options=-Werror
+
+      - name: Test
+        run: stack test --system-ghc --ghc-options=-Werror

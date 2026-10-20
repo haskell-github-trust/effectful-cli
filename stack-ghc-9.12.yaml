@@ -1,0 +1,13 @@
+snapshot: nightly-2026-10-20
+
+packages:
+- .
+
+extra-deps:
+- http-client-effectful-1.0.0
+
+# http-client-effectful-1.0.0 caps effectful < 2.7 and http-client-tls < 0.4;
+# the nightly ships newer, and pinning older ones cascades into the TLS stack
+allow-newer: true
+allow-newer-deps:
+- http-client-effectful
