@@ -3,6 +3,7 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_call:
 
 jobs:
   format:
@@ -55,6 +56,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      # the default Xcode's ld can't parse the CLT SDK's .tbd files (arm64e.x1),
+      # see https://github.com/haskell/cabal/issues/12465
+      - if: runner.os == 'macOS'
+        run: sudo xcode-select -s /Library/Developer/CommandLineTools
       - uses: haskell-actions/setup@v2
         with:
           ghc-version: ${{ matrix.ghc }}
