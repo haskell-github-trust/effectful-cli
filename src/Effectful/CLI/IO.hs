@@ -31,30 +31,37 @@ import Text.Megaparsec.Char (string')
 import Text.Megaparsec.Char.Lexer (decimal, signed)
 import Text.Printf (printf)
 
+-- | @since 0.1.0.0
 printOutput :: IOE :> es => String -> Eff es ()
 printOutput = liftIO . putStr
 
+-- | @since 0.1.0.0
 printOutputLn :: IOE :> es => String -> Eff es ()
 printOutputLn = liftIO . putStrLn
 
+-- | @since 0.1.0.0
 printError :: IOE :> es => String -> Eff es ()
 printError = liftIO . hPutStr stderr
 
+-- | @since 0.1.0.0
 printLines :: IOE :> es => [String] -> Eff es ()
 printLines = printOutput . unlines
 
+-- | @since 0.1.0.0
 prompt :: IOE :> es => Maybe String -> Eff es String
 prompt p = liftIO $ do
   hPutStr stderr (fromMaybe "" p ++ "> ")
   hFlush stderr
   getLine
 
+-- | @since 0.1.0.0
 prompt'
   :: Error CLIError :> es => IOE :> es => Maybe String -> Parsec Void String a -> Eff es a
 prompt' p parser =
   prompt p
     >>= either (throwError . InputError . errorBundlePretty) pure . runParser parser "prompt"
 
+-- | @since 0.1.0.0
 askForConfirm :: Error CLIError :> es => IOE :> es => Eff es Bool
 askForConfirm = prompt' (Just "proceed ?") yesOrNo
  where
@@ -62,6 +69,8 @@ askForConfirm = prompt' (Just "proceed ?") yesOrNo
   yesOrNo = (yes $> True) <|> pure False
 
 -- | Ambiguous in @c@: call as @withConfirm @MyConfig@.
+--
+-- @since 0.1.0.0
 withConfirm
   :: forall c es a
    . CLIConfig c => Error CLIError :> es => IOE :> es => Reader c :> es => Eff es a -> Eff es a
@@ -73,9 +82,11 @@ withConfirm action = do
     unless ok $ throwError (UserCanceled Nothing)
   action
 
+-- | @since 0.1.0.0
 autoOpen :: Process :> es => String -> Eff es ()
 autoOpen arg = callProcess "xdg-open" [arg]
 
+-- | @since 0.1.0.0
 chooseItem
   :: Error CLIError :> es
   => IOE :> es
@@ -91,6 +102,8 @@ chooseItem name headers row xs = do
   either throwError (pure . (xs !!)) (resolveIndex (length xs) i)
 
 -- | Turn a 1-based (or negative, from the end) user index into a 0-based one.
+--
+-- @since 0.1.0.0
 resolveIndex :: Int -> Int -> Either CLIError Int
 resolveIndex len i
   | i >= 1 && i <= len = Right (i - 1)

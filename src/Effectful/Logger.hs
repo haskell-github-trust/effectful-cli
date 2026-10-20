@@ -34,20 +34,25 @@ import OpenTelemetry.Instrumentation.MonadLogger qualified as OTel
 import OpenTelemetry.Log.Core qualified as OTel
 import System.IO (stderr)
 
+-- | @since 0.1.0.0
 type LogFunc = Loc -> LogSource -> LogLevel -> LogStr -> IO ()
 
+-- | @since 0.1.0.0
 data Logger :: Effect
 
 type instance DispatchOf Logger = Static WithSideEffects
 
 newtype instance StaticRep Logger = Logger LogFunc
 
+-- | @since 0.1.0.0
 runLogger :: IOE :> es => LogFunc -> Eff (Logger : es) a -> Eff es a
 runLogger = evalStaticRep . Logger
 
+-- | @since 0.1.0.0
 runStderrLogger :: IOE :> es => Eff (Logger : es) a -> Eff es a
 runStderrLogger = runLogger (defaultOutput stderr)
 
+-- | @since 0.1.0.0
 runOTelLogger :: IOE :> es => OTel.Logger -> Eff (Logger : es) a -> Eff es a
 runOTelLogger = runLogger . OTel.makeOTelLogCallback
 

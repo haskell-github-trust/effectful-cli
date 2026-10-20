@@ -9,6 +9,7 @@ import Effectful.HttpClient (HttpClient)
 import Effectful.Logger (Logger)
 import Effectful.Reader.Static (Reader)
 
+-- | @since 0.1.0.0
 type CLIEffects c e es =
   ( IOE :> es
   , Reader c :> es

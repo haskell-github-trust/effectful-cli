@@ -3,6 +3,7 @@ module Data.Error.CLI (
   displayCLIError,
 ) where
 
+-- | @since 0.1.0.0
 data CLIError
   = InputError String
   | NotFoundError String
@@ -10,6 +11,7 @@ data CLIError
   | UserCanceled (Maybe String)
   deriving (Eq, Show)
 
+-- | @since 0.1.0.0
 displayCLIError :: CLIError -> String
 displayCLIError (InputError s) = "input error: " ++ s
 displayCLIError (NotFoundError s) = "not found: " ++ s

@@ -11,6 +11,7 @@ import Data.List (intercalate)
 import Data.Maybe (fromMaybe)
 import Options.Applicative
 
+-- | @since 0.1.0.0
 data CLIArgs c = CLIArgs
   { _logLevel :: Maybe LogLevel
   , _debug :: Bool
@@ -24,15 +25,19 @@ logLevels :: [(String, LogLevel)]
 logLevels =
   [("debug", LevelDebug), ("info", LevelInfo), ("warn", LevelWarn), ("error", LevelError)]
 
+-- | @since 0.1.0.0
 getLogLevel :: CLIArgs c -> LogLevel
 getLogLevel a = fromMaybe (if _debug a then LevelDebug else LevelInfo) (_logLevel a)
 
+-- | @since 0.1.0.0
 showVersion :: String -> IO ()
 showVersion = putStrLn
 
+-- | @since 0.1.0.0
 versionOrCommand :: String -> CLIArgs c -> (c -> IO ()) -> IO ()
 versionOrCommand v a run = either (const (showVersion v)) run (_command a)
 
+-- | @since 0.1.0.0
 argParser :: Parser c -> Parser (CLIArgs c)
 argParser cmdParser =
   CLIArgs
