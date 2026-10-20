@@ -13,7 +13,7 @@ CI (`.github/workflows/ci.yml`) runs all of the above; keep it green.
 
 ## Style
 
-- `fmap` over `map`
+- `fmap` over `map`, `<>` over `++` (enforced by hlint)
 - curried constraints: `Read a => Ord a => a`, not `(Read a, Ord a) => a`;
   not enforced by tooling; constraint aliases such as `CLIEffects` stay tuples
 - `-Wredundant-constraints` on: only add `Show e` for `throwError` where needed

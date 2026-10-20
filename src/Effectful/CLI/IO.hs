@@ -50,7 +50,7 @@ printLines = printOutput . unlines
 -- | @since 0.1.0.0
 prompt :: IOE :> es => Maybe String -> Eff es String
 prompt p = liftIO $ do
-  hPutStr stderr (fromMaybe "" p ++ "> ")
+  hPutStr stderr (fromMaybe "" p <> "> ")
   hFlush stderr
   getLine
 
@@ -91,7 +91,7 @@ chooseItem
   :: Error CLIError :> es
   => IOE :> es
   => String -> [String] -> (a -> [String]) -> [a] -> Eff es a
-chooseItem name _ _ [] = throwError (NotFoundError ("no item found for " ++ name))
+chooseItem name _ _ [] = throwError (NotFoundError ("no item found for " <> name))
 chooseItem _ _ _ [x] = pure x
 chooseItem name headers row xs = do
   let hs = "#" : headers

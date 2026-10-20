@@ -34,6 +34,6 @@ sleep n = do
 -- | @since 0.1.0.0
 sleepUntil :: IOE :> es => Logger :> es => LocalTime -> Eff es ()
 sleepUntil t = do
-  logInfoN (T.pack ("sleeping until " ++ formatTime defaultTimeLocale "%R" t))
+  logInfoN (T.pack ("sleeping until " <> formatTime defaultTimeLocale "%R" t))
   now <- getLocalTime
   sleep . ceiling . nominalDiffTimeToSeconds $ diffLocalTime t now

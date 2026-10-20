@@ -13,8 +13,8 @@ data CLIError
 
 -- | @since 0.1.0.0
 displayCLIError :: CLIError -> String
-displayCLIError (InputError s) = "input error: " ++ s
-displayCLIError (NotFoundError s) = "not found: " ++ s
-displayCLIError (NotImplemented s) = "not implemented: " ++ s
+displayCLIError (InputError s) = "input error: " <> s
+displayCLIError (NotFoundError s) = "not found: " <> s
+displayCLIError (NotImplemented s) = "not implemented: " <> s
 displayCLIError (UserCanceled Nothing) = "user canceled"
-displayCLIError (UserCanceled (Just s)) = "user canceled: " ++ s
+displayCLIError (UserCanceled (Just s)) = "user canceled: " <> s

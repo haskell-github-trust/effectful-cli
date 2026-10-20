@@ -47,7 +47,7 @@ argParser cmdParser =
           ( short 'l'
               <> long "log-level"
               <> metavar "LEVEL"
-              <> help ("Log level: " ++ intercalate ", " (fmap fst logLevels))
+              <> help ("Log level: " <> intercalate ", " (fmap fst logLevels))
           )
       )
     <*> switch (short 'd' <> long "debug" <> help "Enable debug output (overruled by -l)")
