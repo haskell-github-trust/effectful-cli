@@ -25,6 +25,8 @@ jobs:
       - uses: freckle/stack-action@v5
         with:
           test: false
+          # cached GHC settings are image-specific (e.g. linker), keep caches per runner image
+          cache-prefix: ${{ env.ImageOS }}-
 
       - uses: actions/setup-node@v4
         with:
