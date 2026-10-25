@@ -1,3 +1,4 @@
+-- | Helpers for building optparse-applicative parsers and subcommands.
 module Data.CLI.Impl (
   unboundEnumError,
   fromParsec,

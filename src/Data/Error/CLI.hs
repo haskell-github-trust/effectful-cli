@@ -1,14 +1,21 @@
+-- | Errors common to CLI applications.
 module Data.Error.CLI (
   CLIError (..),
   displayCLIError,
 ) where
 
--- | @since 0.1.0.0
+-- | Errors raised by CLI helpers.
+--
+-- @since 0.1.0.0
 data CLIError
-  = InputError String
-  | NotFoundError String
-  | NotImplemented String
-  | UserCanceled (Maybe String)
+  = -- | Invalid user input.
+    InputError String
+  | -- | Requested item does not exist.
+    NotFoundError String
+  | -- | Feature not implemented yet.
+    NotImplemented String
+  | -- | User declined a confirmation, with an optional reason.
+    UserCanceled (Maybe String)
   deriving (Eq, Show)
 
 -- | Render a 'CLIError' as a human-readable message.

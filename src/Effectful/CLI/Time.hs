@@ -1,3 +1,4 @@
+-- | Current time helpers, in 'IO' and 'Eff'.
 module Effectful.CLI.Time (
   getLocalTimeIO,
   getBeginningOfDayIO,

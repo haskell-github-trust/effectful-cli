@@ -1,3 +1,4 @@
+-- | Logged sleeping helpers.
 module Effectful.CLI.Sleep (
   msleep,
   sleep,

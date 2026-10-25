@@ -1,5 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
+-- | Terminal output, prompts and confirmations.
 module Effectful.CLI.IO (
   printOutput,
   printOutputLn,

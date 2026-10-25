@@ -34,10 +34,14 @@ import OpenTelemetry.Instrumentation.MonadLogger qualified as OTel
 import OpenTelemetry.Log.Core qualified as OTel
 import System.IO (stderr)
 
--- | @since 0.1.0.0
+-- | monad-logger style log callback.
+--
+-- @since 0.1.0.0
 type LogFunc = Loc -> LogSource -> LogLevel -> LogStr -> IO ()
 
--- | @since 0.1.0.0
+-- | Static effect providing a 'LogFunc'.
+--
+-- @since 0.1.0.0
 data Logger :: Effect
 
 type instance DispatchOf Logger = Static WithSideEffects

@@ -1,3 +1,4 @@
+-- | Global command-line options shared by all commands.
 module Data.CLI.Args (
   CLIArgs (..),
   getLogLevel,
@@ -11,14 +12,22 @@ import Data.List (intercalate)
 import Data.Maybe (fromMaybe)
 import Options.Applicative
 
--- | @since 0.1.0.0
+-- | Parsed global options, with the command of type @c@.
+--
+-- @since 0.1.0.0
 data CLIArgs c = CLIArgs
   { _logLevel :: Maybe LogLevel
+  -- ^ @-l@/@--log-level@
   , _debug :: Bool
+  -- ^ @-d@/@--debug@
   , _autoAccept :: Bool
+  -- ^ @-y@/@--yes@
   , _autoDecline :: Bool
+  -- ^ @-n@/@--no@
   , _config :: Maybe FilePath
+  -- ^ @-c@/@--config@
   , _command :: Either () c
+  -- ^ 'Left' for @-v@/@--version@, otherwise the parsed command
   }
 
 logLevels :: [(String, LogLevel)]

@@ -1,3 +1,4 @@
+-- | Concurrency helpers built on "Effectful.Concurrent.Async".
 module Effectful.CLI.Conc (
   concurrently,
   concurrently_,
