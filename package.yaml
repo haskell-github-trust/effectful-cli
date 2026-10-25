@@ -12,7 +12,7 @@ description: >-
 extra-source-files:
   - README.md
 
-extra-docs-files:
+extra-doc-files:
   - CHANGELOG.md
 
 language: GHC2021
