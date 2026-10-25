@@ -11,7 +11,9 @@ data CLIError
   | UserCanceled (Maybe String)
   deriving (Eq, Show)
 
--- | @since 0.1.0.0
+-- | Render a 'CLIError' as a human-readable message.
+--
+-- @since 0.1.0.0
 displayCLIError :: CLIError -> String
 displayCLIError (InputError s) = "input error: " <> s
 displayCLIError (NotFoundError s) = "not found: " <> s

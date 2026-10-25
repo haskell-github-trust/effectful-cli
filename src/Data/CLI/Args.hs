@@ -23,21 +23,40 @@ data CLIArgs c = CLIArgs
 
 logLevels :: [(String, LogLevel)]
 logLevels =
-  [("debug", LevelDebug), ("info", LevelInfo), ("warn", LevelWarn), ("error", LevelError)]
+  [ ("debug", LevelDebug)
+  , ("info", LevelInfo)
+  , ("warn", LevelWarn)
+  , ("error", LevelError)
+  ]
 
--- | @since 0.1.0.0
+-- | Effective log level:
+--   * @--log-level@ if given
+--   * debug with @--debug@
+--   * info otherwise
+--
+-- @since 0.1.0.0
 getLogLevel :: CLIArgs c -> LogLevel
 getLogLevel a = fromMaybe (if _debug a then LevelDebug else LevelInfo) (_logLevel a)
 
--- | @since 0.1.0.0
+-- | Print the version string to stdout.
+--
+-- @since 0.1.0.0
 showVersion :: String -> IO ()
 showVersion = putStrLn
 
--- | @since 0.1.0.0
-versionOrCommand :: String -> CLIArgs c -> (c -> IO ()) -> IO ()
+-- | Print the version if @--version@ was passed, otherwise run the parsed command.
+--
+-- @since 0.1.0.0
+versionOrCommand
+  :: String
+  -> CLIArgs c
+  -> (c -> IO ())
+  -> IO ()
 versionOrCommand v a run = either (const (showVersion v)) run (_command a)
 
--- | @since 0.1.0.0
+-- | Parser for the common CLI options, wrapping the given command parser.
+--
+-- @since 0.1.0.0
 argParser :: Parser c -> Parser (CLIArgs c)
 argParser cmdParser =
   CLIArgs

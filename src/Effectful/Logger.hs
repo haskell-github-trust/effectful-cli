@@ -44,15 +44,21 @@ type instance DispatchOf Logger = Static WithSideEffects
 
 newtype instance StaticRep Logger = Logger LogFunc
 
--- | @since 0.1.0.0
+-- | Run the t'Logger' effect with the given log callback.
+--
+-- @since 0.1.0.0
 runLogger :: IOE :> es => LogFunc -> Eff (Logger : es) a -> Eff es a
 runLogger = evalStaticRep . Logger
 
--- | @since 0.1.0.0
+-- | Run the t'Logger' effect, writing to stderr.
+--
+-- @since 0.1.0.0
 runStderrLogger :: IOE :> es => Eff (Logger : es) a -> Eff es a
 runStderrLogger = runLogger (defaultOutput stderr)
 
--- | @since 0.1.0.0
+-- | Run the t'Logger' effect, emitting OpenTelemetry log records.
+--
+-- @since 0.1.0.0
 runOTelLogger :: IOE :> es => OTel.Logger -> Eff (Logger : es) a -> Eff es a
 runOTelLogger = runLogger . OTel.makeOTelLogCallback
 

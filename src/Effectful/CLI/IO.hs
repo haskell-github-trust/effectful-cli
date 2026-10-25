@@ -31,44 +31,61 @@ import Text.Megaparsec.Char (string')
 import Text.Megaparsec.Char.Lexer (decimal, signed)
 import Text.Printf (printf)
 
--- | @since 0.1.0.0
+-- | Print to stdout without a trailing newline.
+--
+-- @since 0.1.0.0
 printOutput :: IOE :> es => String -> Eff es ()
 printOutput = liftIO . putStr
 
--- | @since 0.1.0.0
+-- | Print to stdout with a trailing newline.
+--
+-- @since 0.1.0.0
 printOutputLn :: IOE :> es => String -> Eff es ()
 printOutputLn = liftIO . putStrLn
 
--- | @since 0.1.0.0
+-- | Print to stderr without a trailing newline.
+--
+-- @since 0.1.0.0
 printError :: IOE :> es => String -> Eff es ()
 printError = liftIO . hPutStr stderr
 
--- | @since 0.1.0.0
+-- | Print lines to stdout, each followed by a newline.
+--
+-- @since 0.1.0.0
 printLines :: IOE :> es => [String] -> Eff es ()
 printLines = printOutput . unlines
 
--- | @since 0.1.0.0
+-- | Read a line from stdin after printing an optional prompt to stderr.
+--
+-- @since 0.1.0.0
 prompt :: IOE :> es => Maybe String -> Eff es String
 prompt p = liftIO $ do
   hPutStr stderr (fromMaybe "" p <> "> ")
   hFlush stderr
   getLine
 
--- | @since 0.1.0.0
+-- | Prompt and parse the answer, throwing 'InputError' on parse failure.
+--
+-- @since 0.1.0.0
 prompt'
   :: Error CLIError :> es => IOE :> es => Maybe String -> Parsec Void String a -> Eff es a
 prompt' p parser =
   prompt p
     >>= either (throwError . InputError . errorBundlePretty) pure . runParser parser "prompt"
 
--- | @since 0.1.0.0
+-- | Ask for confirmation; @y@, @yes@ or an empty answer mean yes.
+--
+-- @since 0.1.0.0
 askForConfirm :: Error CLIError :> es => IOE :> es => Eff es Bool
 askForConfirm = prompt' (Just "proceed ?") yesOrNo
  where
   yes = void (string' "y" <|> string' "yes") <|> eof
   yesOrNo = (yes $> True) <|> pure False
 
--- | Ambiguous in @c@: call as @withConfirm @MyConfig@.
+-- | Run the action after user confirmation, honoring the config's auto-accept and
+-- auto-decline flags; throws 'UserCanceled' when declined.
+--
+-- Ambiguous in @c@: call as @withConfirm @MyConfig@.
 --
 -- @since 0.1.0.0
 withConfirm
@@ -82,11 +99,15 @@ withConfirm action = do
     unless ok $ throwError (UserCanceled Nothing)
   action
 
--- | @since 0.1.0.0
+-- | Open a file or URL with @xdg-open@.
+--
+-- @since 0.1.0.0
 autoOpen :: Process :> es => String -> Eff es ()
 autoOpen arg = callProcess "xdg-open" [arg]
 
--- | @since 0.1.0.0
+-- | Let the user pick one item from a table; a single item is returned without prompting, none throws 'NotFoundError'.
+--
+-- @since 0.1.0.0
 chooseItem
   :: Error CLIError :> es
   => IOE :> es

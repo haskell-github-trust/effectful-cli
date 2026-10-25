@@ -6,7 +6,8 @@ maintainer: drlkf <drlkf@drlkf.net>
 copyright: 2026 drlkf
 category: CLI
 synopsis: CLI helpers for the effectful ecosystem
-description: Please see the README at https://github.com/haskell-github-trust/effectful-cli.
+description: >-
+  Please see the README at https://github.com/haskell-github-trust/effectful-cli
 
 extra-source-files:
   - README.md
