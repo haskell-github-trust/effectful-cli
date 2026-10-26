@@ -1,3 +1,9 @@
+## [2.1.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.0.0...2.1.0) (2026-10-26)
+
+### Features
+
+* add io exception wrapper ([63d7f60](https://github.com/haskell-github-trust/effectful-cli/commit/63d7f604d6c93dc7d85abf3c4d316637e9801e19))
+
 ## [2.0.0](https://github.com/haskell-github-trust/effectful-cli/compare/1.0.2...2.0.0) (2026-10-26)
 
 ### ⚠ BREAKING CHANGES

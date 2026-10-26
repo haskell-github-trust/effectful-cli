@@ -40,6 +40,7 @@ Effectful.CLI.Conc.mapConcurrently
 Effectful.CLI.Conc.mapConcurrently_
 Effectful.CLI.Conc.runConcurrently
 Effectful.CLI.Conc.runConcurrently_
+Effectful.CLI.Exception.rethrowIO
 Effectful.CLI.IO.askForConfirm
 Effectful.CLI.IO.autoOpen
 Effectful.CLI.IO.chooseItem
