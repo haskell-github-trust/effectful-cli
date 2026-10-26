@@ -28,7 +28,7 @@ jobs:
           # cached GHC settings are image-specific (e.g. linker), keep caches per runner image
           cache-prefix: ${{ env.ImageOS }}-
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
           cache: npm
