@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- | Terminal output, prompts and confirmations.
 module Effectful.CLI.IO (
@@ -21,12 +22,15 @@ import Data.Error.CLI (CLIError (..))
 import Data.Foldable (toList)
 import Data.Functor (($>))
 import Data.Maybe (fromMaybe)
+import Data.Text (Text)
+import Data.Text qualified as T
+import Data.Text.IO qualified as T
 import Data.Void (Void)
 import Effectful (Eff, IOE, liftIO, (:>))
 import Effectful.Error.Static (Error, throwError)
 import Effectful.Process (Process, callProcess)
 import Effectful.Reader.Static (Reader, ask)
-import System.IO (hFlush, hPutStr, stderr)
+import System.IO (hFlush, stderr)
 import Text.Layout.Table (columnHeaderTableS, def, rowsG, tableString, titlesH, unicodeS)
 import Text.Megaparsec (Parsec, eof, errorBundlePretty, runParser, (<|>))
 import Text.Megaparsec.Char (string')
@@ -36,44 +40,45 @@ import Text.Printf (printf)
 -- | Print to stdout without a trailing newline.
 --
 -- @since 0.1.0.0
-printOutput :: IOE :> es => String -> Eff es ()
-printOutput = liftIO . putStr
+printOutput :: IOE :> es => Text -> Eff es ()
+printOutput = liftIO . T.putStr
 
 -- | Print to stdout with a trailing newline.
 --
 -- @since 0.1.0.0
-printOutputLn :: IOE :> es => String -> Eff es ()
-printOutputLn = liftIO . putStrLn
+printOutputLn :: IOE :> es => Text -> Eff es ()
+printOutputLn = liftIO . T.putStrLn
 
 -- | Print to stderr without a trailing newline.
 --
 -- @since 0.1.0.0
-printError :: IOE :> es => String -> Eff es ()
-printError = liftIO . hPutStr stderr
+printError :: IOE :> es => Text -> Eff es ()
+printError = liftIO . T.hPutStr stderr
 
 -- | Print lines to stdout, each followed by a newline.
 --
 -- @since 0.1.0.0
-printLines :: IOE :> es => Foldable f => f String -> Eff es ()
-printLines = printOutput . unlines . toList
+printLines :: IOE :> es => Foldable f => f Text -> Eff es ()
+printLines = printOutput . T.unlines . toList
 
 -- | Read a line from stdin after printing an optional prompt to stderr.
 --
 -- @since 0.1.0.0
-prompt :: IOE :> es => Maybe String -> Eff es String
+prompt :: IOE :> es => Maybe Text -> Eff es Text
 prompt p = liftIO $ do
-  hPutStr stderr (fromMaybe "" p <> "> ")
+  T.hPutStr stderr (fromMaybe "" p <> "> ")
   hFlush stderr
-  getLine
+  T.getLine
 
 -- | Prompt and parse the answer, throwing 'InputError' on parse failure.
 --
 -- @since 0.1.0.0
 prompt'
-  :: Error CLIError :> es => IOE :> es => Maybe String -> Parsec Void String a -> Eff es a
+  :: Error CLIError :> es => IOE :> es => Maybe Text -> Parsec Void Text a -> Eff es a
 prompt' p parser =
   prompt p
-    >>= either (throwError . InputError . errorBundlePretty) pure . runParser parser "prompt"
+    >>= either (throwError . InputError . T.pack . errorBundlePretty) pure
+      . runParser parser "prompt"
 
 -- | Ask for confirmation; @y@, @yes@ or an empty answer mean yes.
 --
@@ -114,17 +119,17 @@ chooseItem
   :: Error CLIError :> es
   => IOE :> es
   => Foldable f
-  => String -> [String] -> (a -> [String]) -> f a -> Eff es a
+  => Text -> [Text] -> (a -> [Text]) -> f a -> Eff es a
 chooseItem name headers row = go . toList
  where
   go [] = throwError (NotFoundError ("no item found for " <> name))
   go [x] = pure x
   go xs = pick xs
   pick xs = do
-    let hs = "#" : headers
-        rows = zipWith (\i x -> show i : row x) [1 :: Int ..] xs
-    printOutputLn
-      (tableString (columnHeaderTableS (fmap (const def) hs) unicodeS (titlesH hs) [rowsG rows]))
+    let hs = "#" : fmap T.unpack headers
+        rows = zipWith (\i x -> show i : fmap T.unpack (row x)) [1 :: Int ..] xs
+    printOutputLn . T.pack $
+      tableString (columnHeaderTableS (fmap (const def) hs) unicodeS (titlesH hs) [rowsG rows])
     i <- prompt' (Just name) (signed (pure ()) decimal)
     either throwError (pure . (xs !!)) (resolveIndex (length xs) i)
 
@@ -135,4 +140,4 @@ resolveIndex :: Int -> Int -> Either CLIError Int
 resolveIndex len i
   | i >= 1 && i <= len = Right (i - 1)
   | i <= -1 && i >= -len = Right (len + i)
-  | otherwise = Left (InputError (printf "index %d out of bounds" i))
+  | otherwise = Left (InputError (T.pack $ printf "index %d out of bounds" i))

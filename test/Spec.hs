@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 import Data.CLI.Impl (fromParsec)
 import Data.Error.CLI (CLIError (..), displayCLIError)
 import Effectful (runEff)
