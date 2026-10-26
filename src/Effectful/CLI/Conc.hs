@@ -14,6 +14,8 @@ module Effectful.CLI.Conc (
   batchConcurrentlyWithIndex_,
 ) where
 
+import Data.Foldable (toList)
+import Data.Traversable (mapAccumL)
 import Effectful (Eff, (:>))
 import Effectful.Concurrent.Async (
   Concurrent,
@@ -52,10 +54,11 @@ runConcurrently_ = mapConcurrently_ id
 -- @since 0.1.0.0
 batchConcurrently
   :: Concurrent :> es
+  => Traversable t
   => Int
   -> (a -> Eff es b)
-  -> [a]
-  -> Eff es [b]
+  -> t a
+  -> Eff es (t b)
 batchConcurrently = pooledMapConcurrentlyN
 
 -- | Like 'batchConcurrently', discarding results.
@@ -63,9 +66,10 @@ batchConcurrently = pooledMapConcurrentlyN
 -- @since 0.1.0.0
 batchConcurrently_
   :: Concurrent :> es
+  => Foldable f
   => Int
   -> (a -> Eff es b)
-  -> [a]
+  -> f a
   -> Eff es ()
 batchConcurrently_ = pooledMapConcurrentlyN_
 
@@ -74,19 +78,22 @@ batchConcurrently_ = pooledMapConcurrentlyN_
 -- @since 0.1.0.0
 batchConcurrentlyWithIndex
   :: Concurrent :> es
+  => Traversable t
   => Int
   -> (Int -> a -> Eff es b)
-  -> [a]
-  -> Eff es [b]
-batchConcurrentlyWithIndex n f = batchConcurrently n (uncurry f) . zip [1 ..]
+  -> t a
+  -> Eff es (t b)
+batchConcurrentlyWithIndex n f =
+  batchConcurrently n (uncurry f) . snd . mapAccumL (\i x -> (i + 1, (i, x))) 1
 
 -- | Like 'batchConcurrentlyWithIndex', discarding results.
 --
 -- @since 0.1.0.0
 batchConcurrentlyWithIndex_
   :: Concurrent :> es
+  => Foldable f
   => Int
   -> (Int -> a -> Eff es b)
-  -> [a]
+  -> f a
   -> Eff es ()
-batchConcurrentlyWithIndex_ n f = batchConcurrently_ n (uncurry f) . zip [1 ..]
+batchConcurrentlyWithIndex_ n f = batchConcurrently_ n (uncurry f) . zip [1 ..] . toList

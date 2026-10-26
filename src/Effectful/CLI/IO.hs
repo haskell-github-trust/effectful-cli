@@ -18,6 +18,7 @@ module Effectful.CLI.IO (
 import Control.Monad (unless, void, when)
 import Data.CLI.Class (CLIConfig (..))
 import Data.Error.CLI (CLIError (..))
+import Data.Foldable (toList)
 import Data.Functor (($>))
 import Data.Maybe (fromMaybe)
 import Data.Void (Void)
@@ -53,8 +54,8 @@ printError = liftIO . hPutStr stderr
 -- | Print lines to stdout, each followed by a newline.
 --
 -- @since 0.1.0.0
-printLines :: IOE :> es => [String] -> Eff es ()
-printLines = printOutput . unlines
+printLines :: IOE :> es => Foldable f => f String -> Eff es ()
+printLines = printOutput . unlines . toList
 
 -- | Read a line from stdin after printing an optional prompt to stderr.
 --
@@ -112,16 +113,20 @@ autoOpen arg = callProcess "xdg-open" [arg]
 chooseItem
   :: Error CLIError :> es
   => IOE :> es
-  => String -> [String] -> (a -> [String]) -> [a] -> Eff es a
-chooseItem name _ _ [] = throwError (NotFoundError ("no item found for " <> name))
-chooseItem _ _ _ [x] = pure x
-chooseItem name headers row xs = do
-  let hs = "#" : headers
-      rows = zipWith (\i x -> show i : row x) [1 :: Int ..] xs
-  printOutputLn
-    (tableString (columnHeaderTableS (fmap (const def) hs) unicodeS (titlesH hs) [rowsG rows]))
-  i <- prompt' (Just name) (signed (pure ()) decimal)
-  either throwError (pure . (xs !!)) (resolveIndex (length xs) i)
+  => Foldable f
+  => String -> [String] -> (a -> [String]) -> f a -> Eff es a
+chooseItem name headers row = go . toList
+ where
+  go [] = throwError (NotFoundError ("no item found for " <> name))
+  go [x] = pure x
+  go xs = pick xs
+  pick xs = do
+    let hs = "#" : headers
+        rows = zipWith (\i x -> show i : row x) [1 :: Int ..] xs
+    printOutputLn
+      (tableString (columnHeaderTableS (fmap (const def) hs) unicodeS (titlesH hs) [rowsG rows]))
+    i <- prompt' (Just name) (signed (pure ()) decimal)
+    either throwError (pure . (xs !!)) (resolveIndex (length xs) i)
 
 -- | Turn a 1-based (or negative, from the end) user index into a 0-based one.
 --
