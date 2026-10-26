@@ -13,6 +13,7 @@ jobs:
       - uses: haskell-actions/run-fourmolu@v13
         with:
           version: 0.21.0.0
+          extra-args: -o -XGHC2021
           pattern: |
             src/**/*.hs
             test/**/*.hs
