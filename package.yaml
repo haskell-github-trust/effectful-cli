@@ -41,6 +41,7 @@ library:
     - Data.Error.CLI
     - Effectful.CLI
     - Effectful.CLI.Conc
+    - Effectful.CLI.Exception
     - Effectful.CLI.IO
     - Effectful.CLI.Sleep
     - Effectful.CLI.Time

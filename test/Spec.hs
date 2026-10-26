@@ -1,11 +1,14 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import Data.CLI.Impl (fromParsec)
 import Data.Error.CLI (CLIError (..), displayCLIError)
-import Effectful (runEff)
+import Effectful (Eff, IOE, liftIO, runEff)
 import Effectful.CLI.Conc (batchConcurrentlyWithIndex)
+import Effectful.CLI.Exception (rethrowIO)
 import Effectful.CLI.IO (resolveIndex)
 import Effectful.Concurrent (runConcurrent)
+import Effectful.Error.Static (Error, runErrorNoCallStack)
 import Options.Applicative
 import Test.Hspec
 import Text.Megaparsec.Char (string)
@@ -26,6 +29,14 @@ main = hspec $ do
 
     it "works with a batch smaller than the list" $
       run 2 `shouldReturn` expected
+
+  describe "rethrowIO"
+    $ it "rethrows IOException as app error"
+    $ runEff
+      ( runErrorNoCallStack
+          (rethrowIO show (liftIO (ioError (userError "boom")) :: Eff '[Error String, IOE] ()))
+      )
+      `shouldReturn` Left "user error (boom)"
 
   describe "resolveIndex" $ do
     let len = 4
