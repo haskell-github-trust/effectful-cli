@@ -16,6 +16,7 @@ Data.CLI.Impl.mkCommand
 Data.CLI.Impl.mkCommands
 Data.CLI.Impl.noArgs
 Data.CLI.Impl.noopSwitch
+Data.CLI.Impl.reversibleSwitch
 Data.CLI.Impl.unboundEnumError
 Data.CLI.Impl.usage
 Data.CLI.Impl.uuidArg

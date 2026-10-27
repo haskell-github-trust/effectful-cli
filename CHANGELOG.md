@@ -1,3 +1,9 @@
+## [2.2.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.1.0...2.2.0) (2026-10-27)
+
+### Features
+
+* add reversible cli switches ([28c1b75](https://github.com/haskell-github-trust/effectful-cli/commit/28c1b75708fafd8f497d2bc0912ff7be4760a8d0))
+
 ## [2.1.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.0.0...2.1.0) (2026-10-26)
 
 ### Features

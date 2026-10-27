@@ -72,6 +72,8 @@ noopSwitch :: Parser Bool
 noopSwitch = switch (short 'n' <> long "noop" <> help "do not perform any real action")
 
 -- | @--name@/@--no-name@ switch pair; the last occurrence wins, otherwise the default.
+--
+-- @since 0.2.2.0
 reversibleSwitch :: Bool -> String -> String -> Parser Bool
 reversibleSwitch def name h =
   last
