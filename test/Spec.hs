@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import Data.CLI.Impl (fromParsec)
+import Data.CLI.Impl (fromParsec, reversibleSwitch)
 import Data.Error.CLI (CLIError (..), displayCLIError)
 import Effectful (Eff, IOE, liftIO, runEff)
 import Effectful.CLI.Conc (batchConcurrentlyWithIndex)
@@ -78,3 +78,10 @@ main = hspec $ do
 
     it "rejects an invalid input" $
       parse ["ko"] `shouldBe` Nothing
+
+  describe "reversibleSwitch"
+    $ it "uses the default or the last occurrence"
+    $ let p = info (reversibleSwitch True "labels" "show labels") mempty
+          parse = getParseResult . execParserPure defaultPrefs p
+       in fmap parse [[], ["--no-labels"], ["--no-labels", "--labels"], ["--labels", "--no-labels"]]
+            `shouldBe` fmap Just [True, False, True, False]
