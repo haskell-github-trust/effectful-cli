@@ -6,6 +6,7 @@ module Data.CLI.Impl (
   noArgs,
   forceSwitch,
   noopSwitch,
+  reversibleSwitch,
   uuidArg,
   mkCommand,
   mkCommands,
@@ -69,6 +70,13 @@ forceSwitch = switch (short 'f' <> long "force" <> help "force unsafe behavior")
 -- @since 0.1.0.0
 noopSwitch :: Parser Bool
 noopSwitch = switch (short 'n' <> long "noop" <> help "do not perform any real action")
+
+-- | @--name@/@--no-name@ switch pair; the last occurrence wins, otherwise the default.
+reversibleSwitch :: Bool -> String -> String -> Parser Bool
+reversibleSwitch def name h =
+  last
+    <$> some (flag' True (long name <> help h) <|> flag' False (long ("no-" <> name) <> hidden))
+      <|> pure def
 
 -- | UUID given as a positional argument or @-u@/@--uuid@.
 --
