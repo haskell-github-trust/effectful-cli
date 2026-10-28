@@ -1,3 +1,9 @@
+## [2.3.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.2.0...2.3.0) (2026-10-28)
+
+### Features
+
+* add color to helper texts ([c215283](https://github.com/haskell-github-trust/effectful-cli/commit/c215283d77c51d7bf4921f38e003e546e7cac8f6))
+
 ## [2.2.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.1.0...2.2.0) (2026-10-27)
 
 ### Features

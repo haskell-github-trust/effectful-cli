@@ -1,5 +1,6 @@
 Data.CLI.Args.CLIArgs
 Data.CLI.Args.argParser
+Data.CLI.Args.argParserWith
 Data.CLI.Args.getLogLevel
 Data.CLI.Args.showVersion
 Data.CLI.Args.versionOrCommand
@@ -9,16 +10,23 @@ Data.CLI.Class.cmdname
 Data.CLI.Class.doc
 Data.CLI.Class.parser
 Data.CLI.Class.runner
+Data.CLI.Impl.HelpStyle
 Data.CLI.Impl.argOrOpt
+Data.CLI.Impl.colorEnabled
+Data.CLI.Impl.defaultHelpStyle
+Data.CLI.Impl.execCLIParser
 Data.CLI.Impl.forceSwitch
 Data.CLI.Impl.fromParsec
 Data.CLI.Impl.mkCommand
 Data.CLI.Impl.mkCommands
 Data.CLI.Impl.noArgs
 Data.CLI.Impl.noopSwitch
+Data.CLI.Impl.plainHelpStyle
 Data.CLI.Impl.reversibleSwitch
+Data.CLI.Impl.styled
 Data.CLI.Impl.unboundEnumError
 Data.CLI.Impl.usage
+Data.CLI.Impl.usageWith
 Data.CLI.Impl.uuidArg
 Data.Error.CLI.CLIError
 Data.Error.CLI.GHC.Classes.Eq Data.Error.CLI.CLIError
