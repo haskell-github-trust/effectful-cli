@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- | Helpers for building optparse-applicative parsers and subcommands.
 module Data.CLI.Impl (
   unboundEnumError,
@@ -11,6 +13,13 @@ module Data.CLI.Impl (
   mkCommand,
   mkCommands,
   usage,
+  usageWith,
+  HelpStyle (..),
+  defaultHelpStyle,
+  plainHelpStyle,
+  styled,
+  colorEnabled,
+  execCLIParser,
 ) where
 
 import Data.Bifunctor (first)
@@ -21,8 +30,79 @@ import Data.UUID (UUID)
 import Data.UUID qualified as UUID
 import Data.Void (Void)
 import Options.Applicative
+import Options.Applicative.Help.Pretty (
+  AnsiStyle,
+  Color (..),
+  Doc,
+  annotate,
+  bold,
+  color,
+  pretty,
+  unAnnotate,
+  underlined,
+  (<+>),
+ )
+import System.Environment (getArgs, lookupEnv)
+import System.IO (hIsTerminalDevice, stderr, stdout)
 import Text.Megaparsec (Parsec, eof, errorBundlePretty, runParser)
 import Text.Printf (printf)
+
+-- | ANSI styles applied to help texts.
+--
+-- @since 0.2.2.0
+data HelpStyle = HelpStyle
+  { _styleName :: AnsiStyle
+  -- ^ program name in the header
+  , _styleVersion :: AnsiStyle
+  -- ^ version in the header
+  , _styleValue :: AnsiStyle
+  -- ^ accepted values and option references
+  , _styleWarning :: AnsiStyle
+  -- ^ dangerous behavior
+  }
+
+-- | Bold underlined name, green version, cyan values, bold red warnings.
+--
+-- @since 0.2.2.0
+defaultHelpStyle :: HelpStyle
+defaultHelpStyle = HelpStyle (bold <> underlined) (color Green) (color Cyan) (bold <> color Red)
+
+-- | No styling.
+--
+-- @since 0.2.2.0
+plainHelpStyle :: HelpStyle
+plainHelpStyle = HelpStyle mempty mempty mempty mempty
+
+-- | Render a string with the selected style of a t'HelpStyle'.
+--
+-- @since 0.2.2.0
+styled :: (HelpStyle -> AnsiStyle) -> HelpStyle -> String -> Doc
+styled f s
+  | f s == mempty = pretty
+  | otherwise = annotate (f s) . pretty
+
+-- | Whether colors should be emitted: stdout and stderr are terminals and @NO_COLOR@ is unset or empty.
+--
+-- @since 0.2.2.0
+colorEnabled :: IO Bool
+colorEnabled = do
+  noColor <- maybe False (not . null) <$> lookupEnv "NO_COLOR"
+  ttys <- and <$> traverse hIsTerminalDevice [stdout, stderr]
+  pure (ttys && not noColor)
+
+-- | Like 'execParser', stripping help styles when 'colorEnabled' is false.
+--
+-- @since 0.2.2.0
+execCLIParser :: ParserInfo a -> IO a
+execCLIParser pinfo = do
+  c <- colorEnabled
+  res <- execParserPure defaultPrefs pinfo <$> getArgs
+  handleParseResult (if c then res else strip res)
+ where
+  strip (Failure (ParserFailure f)) = Failure (ParserFailure (\p -> let (h, e, w) = f p in (plain h, e, w)))
+  strip r = r
+  plain (ParserHelp a b c d e f g h) = ParserHelp (u a) (u b) (u c) (u d) (u e) (u f) (u g) (u h)
+  u = fmap unAnnotate
 
 -- | Error for 'succ' called on 'maxBound' of the named enum.
 --
@@ -63,7 +143,12 @@ noArgs = pure
 --
 -- @since 0.1.0.0
 forceSwitch :: Parser Bool
-forceSwitch = switch (short 'f' <> long "force" <> help "force unsafe behavior")
+forceSwitch =
+  switch
+    ( short 'f'
+        <> long "force"
+        <> helpDoc (Just ("force" <+> styled _styleWarning defaultHelpStyle "unsafe" <+> "behavior"))
+    )
 
 -- | @-n@/@--noop@ switch for dry runs.
 --
@@ -103,7 +188,24 @@ mkCommands f = foldMap (mkCommand . f) (sortOn cmdname [minBound ..])
 --
 -- @since 0.1.0.0
 usage :: String -> String -> String -> Parser a -> ParserInfo a
-usage name version hdr p =
+usage = usageWith defaultHelpStyle
+
+-- | 'usage' with a custom t'HelpStyle'.
+--
+-- @since 0.2.2.0
+usageWith :: HelpStyle -> String -> String -> String -> Parser a -> ParserInfo a
+usageWith s name version hdr p =
   info
     (p <**> helper)
-    (fullDesc <> progDesc hdr <> header (printf "%s - %s - version %s" name hdr version))
+    ( fullDesc
+        <> progDesc hdr
+        <> headerDoc
+          ( Just
+              ( styled _styleName s name
+                  <+> "-"
+                  <+> pretty hdr
+                  <+> "- version"
+                  <+> styled _styleVersion s version
+              )
+          )
+    )
