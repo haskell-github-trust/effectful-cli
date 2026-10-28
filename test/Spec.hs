@@ -1,8 +1,9 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import Data.CLI.Impl (fromParsec, reversibleSwitch)
+import Data.CLI.Impl (fromParsec, plainHelpStyle, reversibleSwitch, usage, usageWith)
 import Data.Error.CLI (CLIError (..), displayCLIError)
+import Data.List (isInfixOf)
 import Effectful (Eff, IOE, liftIO, runEff)
 import Effectful.CLI.Conc (batchConcurrentlyWithIndex)
 import Effectful.CLI.Exception (rethrowIO)
@@ -85,3 +86,14 @@ main = hspec $ do
           parse = getParseResult . execParserPure defaultPrefs p
        in fmap parse [[], ["--no-labels"], ["--no-labels", "--labels"], ["--labels", "--no-labels"]]
             `shouldBe` fmap Just [True, False, True, False]
+
+  describe "usage"
+    $ it "styles the header unless plain"
+    $ let render st = case execParserPure defaultPrefs (st "prog" "1.0" "desc" (pure ())) ["--help"] of
+            Failure f -> fst (renderFailure f "prog")
+            _ -> ""
+       in ( "\ESC[" `isInfixOf` render usage
+          , "\ESC[" `isInfixOf` render (usageWith plainHelpStyle)
+          , "prog - desc - version 1.0" `isInfixOf` render (usageWith plainHelpStyle)
+          )
+            `shouldBe` (True, False, True)

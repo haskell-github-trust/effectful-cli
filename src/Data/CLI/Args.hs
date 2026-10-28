@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- | Global command-line options shared by all commands.
 module Data.CLI.Args (
   CLIArgs (..),
@@ -5,12 +7,14 @@ module Data.CLI.Args (
   showVersion,
   versionOrCommand,
   argParser,
+  argParserWith,
 ) where
 
 import Control.Monad.Logger (LogLevel (..))
-import Data.List (intercalate)
+import Data.CLI.Impl (HelpStyle (..), defaultHelpStyle, styled)
 import Data.Maybe (fromMaybe)
 import Options.Applicative
+import Options.Applicative.Help.Pretty (punctuate, (<+>))
 
 -- | Parsed global options, with the command of type @c@.
 --
@@ -67,7 +71,13 @@ versionOrCommand v a run = either (const (showVersion v)) run (_command a)
 --
 -- @since 0.1.0.0
 argParser :: Parser c -> Parser (CLIArgs c)
-argParser cmdParser =
+argParser = argParserWith defaultHelpStyle
+
+-- | 'argParser' with a custom t'HelpStyle'.
+--
+-- @since 0.2.2.0
+argParserWith :: HelpStyle -> Parser c -> Parser (CLIArgs c)
+argParserWith s cmdParser =
   CLIArgs
     <$> optional
       ( option
@@ -75,12 +85,20 @@ argParser cmdParser =
           ( short 'l'
               <> long "log-level"
               <> metavar "LEVEL"
-              <> help ("Log level: " <> intercalate ", " (fmap fst logLevels))
+              <> helpDoc (Just ("Log level:" <+> mconcat (punctuate ", " (fmap (val . fst) logLevels))))
           )
       )
-    <*> switch (short 'd' <> long "debug" <> help "Enable debug output (overruled by -l)")
+    <*> switch
+      ( short 'd'
+          <> long "debug"
+          <> helpDoc (Just ("Enable debug output (overruled by" <+> val "-l" <> ")"))
+      )
     <*> switch (short 'y' <> long "yes" <> help "Auto-accept all prompts")
-    <*> switch (short 'n' <> long "no" <> help "Auto-decline all prompts (overrides -y/--yes)")
+    <*> switch
+      ( short 'n'
+          <> long "no"
+          <> helpDoc (Just ("Auto-decline all prompts (overrides" <+> val "-y/--yes" <> ")"))
+      )
     <*> optional
       ( strOption
           (short 'c' <> long "config" <> metavar "PATH" <> help "Path to the configuration file")
@@ -90,3 +108,5 @@ argParser cmdParser =
               <|> Right
             <$> cmdParser
         )
+ where
+  val = styled _styleValue s
