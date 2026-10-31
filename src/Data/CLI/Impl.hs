@@ -90,13 +90,14 @@ colorEnabled = do
   ttys <- and <$> traverse hIsTerminalDevice [stdout, stderr]
   pure (ttys && not noColor)
 
--- | Like 'execParser', stripping help styles when 'colorEnabled' is false.
+-- | Like 'execParser', printing help when run without arguments and stripping help styles when
+-- 'colorEnabled' is false.
 --
 -- @since 0.2.2.0
 execCLIParser :: ParserInfo a -> IO a
 execCLIParser pinfo = do
   c <- colorEnabled
-  res <- execParserPure defaultPrefs pinfo <$> getArgs
+  res <- execParserPure (prefs showHelpOnEmpty) pinfo <$> getArgs
   handleParseResult (if c then res else strip res)
  where
   strip (Failure (ParserFailure f)) = Failure (ParserFailure (\p -> let (h, e, w) = f p in (plain h, e, w)))
