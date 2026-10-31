@@ -3,8 +3,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
--- | monad-logger bridge: a static effect holding a log callback, plus a
--- 'MonadLogger' instance for 'Eff' so the usual @logInfoN@ etc. work.
+-- | [monad-logger](https://hackage.haskell.org/package/monad-logger) bridge: a static
+-- effect holding a log callback, plus a 'MonadLogger' instance for 'Eff' so the usual @logInfoN@ etc. work.
 module Effectful.Logger (
   Logger,
   LogFunc,
@@ -34,7 +34,7 @@ import OpenTelemetry.Instrumentation.MonadLogger qualified as OTel
 import OpenTelemetry.Log.Core qualified as OTel
 import System.IO (stderr)
 
--- | monad-logger style log callback.
+-- | [monad-logger](https://hackage.haskell.org/package/monad-logger) style log callback.
 --
 -- @since 0.1.0.0
 type LogFunc = Loc -> LogSource -> LogLevel -> LogStr -> IO ()
