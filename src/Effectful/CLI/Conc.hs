@@ -36,6 +36,7 @@ runConcurrently
   :: Concurrent :> es
   => Traversable t
   => t (Eff es a)
+  -- ^ actions
   -> Eff es (t a)
 runConcurrently = mapConcurrently id
 
@@ -46,6 +47,7 @@ runConcurrently_
   :: Concurrent :> es
   => Foldable t
   => t (Eff es a)
+  -- ^ actions
   -> Eff es ()
 runConcurrently_ = mapConcurrently_ id
 
@@ -56,8 +58,11 @@ batchConcurrently
   :: Concurrent :> es
   => Traversable t
   => Int
+  -- ^ maximum number of concurrent actions
   -> (a -> Eff es b)
+  -- ^ action for each element
   -> t a
+  -- ^ elements
   -> Eff es (t b)
 batchConcurrently = pooledMapConcurrentlyN
 
@@ -68,8 +73,11 @@ batchConcurrently_
   :: Concurrent :> es
   => Foldable f
   => Int
+  -- ^ maximum number of concurrent actions
   -> (a -> Eff es b)
+  -- ^ action for each element
   -> f a
+  -- ^ elements
   -> Eff es ()
 batchConcurrently_ = pooledMapConcurrentlyN_
 
@@ -80,8 +88,11 @@ batchConcurrentlyWithIndex
   :: Concurrent :> es
   => Traversable t
   => Int
+  -- ^ maximum number of concurrent actions
   -> (Int -> a -> Eff es b)
+  -- ^ action for each element
   -> t a
+  -- ^ elements
   -> Eff es (t b)
 batchConcurrentlyWithIndex n f =
   batchConcurrently n (uncurry f) . snd . mapAccumL (\i x -> (i + 1, (i, x))) 1
@@ -93,7 +104,10 @@ batchConcurrentlyWithIndex_
   :: Concurrent :> es
   => Foldable f
   => Int
+  -- ^ maximum number of concurrent actions
   -> (Int -> a -> Eff es b)
+  -- ^ action for each element
   -> f a
+  -- ^ elements
   -> Eff es ()
 batchConcurrentlyWithIndex_ n f = batchConcurrently_ n (uncurry f) . zip [1 ..] . toList

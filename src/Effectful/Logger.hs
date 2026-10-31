@@ -51,19 +51,35 @@ newtype instance StaticRep Logger = Logger LogFunc
 -- | Run the t'Logger' effect with the given log callback.
 --
 -- @since 0.1.0.0
-runLogger :: IOE :> es => LogFunc -> Eff (Logger : es) a -> Eff es a
+runLogger
+  :: IOE :> es
+  => LogFunc
+  -- ^ log callback
+  -> Eff (Logger : es) a
+  -- ^ action using the logger
+  -> Eff es a
 runLogger = evalStaticRep . Logger
 
 -- | Run the t'Logger' effect, writing to stderr.
 --
 -- @since 0.1.0.0
-runStderrLogger :: IOE :> es => Eff (Logger : es) a -> Eff es a
+runStderrLogger
+  :: IOE :> es
+  => Eff (Logger : es) a
+  -- ^ action using the logger
+  -> Eff es a
 runStderrLogger = runLogger (defaultOutput stderr)
 
 -- | Run the t'Logger' effect, emitting OpenTelemetry log records.
 --
 -- @since 0.1.0.0
-runOTelLogger :: IOE :> es => OTel.Logger -> Eff (Logger : es) a -> Eff es a
+runOTelLogger
+  :: IOE :> es
+  => OTel.Logger
+  -- ^ OpenTelemetry logger
+  -> Eff (Logger : es) a
+  -- ^ action using the logger
+  -> Eff es a
 runOTelLogger = runLogger . OTel.makeOTelLogCallback
 
 instance Logger :> es => MonadLogger (Eff es) where

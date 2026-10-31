@@ -48,13 +48,19 @@ logLevels =
 --   * info otherwise
 --
 -- @since 0.1.0.0
-getLogLevel :: CLIArgs c -> LogLevel
+getLogLevel
+  :: CLIArgs c
+  -- ^ parsed options
+  -> LogLevel
 getLogLevel a = fromMaybe (if _debug a then LevelDebug else LevelInfo) (_logLevel a)
 
 -- | Print the version string to stdout.
 --
 -- @since 0.1.0.0
-showVersion :: String -> IO ()
+showVersion
+  :: String
+  -- ^ version
+  -> IO ()
 showVersion = putStrLn
 
 -- | Print the version if @--version@ was passed, otherwise run the parsed command.
@@ -62,21 +68,32 @@ showVersion = putStrLn
 -- @since 0.1.0.0
 versionOrCommand
   :: String
+  -- ^ version
   -> CLIArgs c
+  -- ^ parsed options
   -> (c -> IO ())
+  -- ^ command runner
   -> IO ()
 versionOrCommand v a run = either (const (showVersion v)) run (_command a)
 
 -- | Parser for the common CLI options, wrapping the given command parser.
 --
 -- @since 0.1.0.0
-argParser :: Parser c -> Parser (CLIArgs c)
+argParser
+  :: Parser c
+  -- ^ command parser
+  -> Parser (CLIArgs c)
 argParser = argParserWith defaultHelpStyle
 
 -- | 'argParser' with a custom t'HelpStyle'.
 --
 -- @since 0.2.2.0
-argParserWith :: HelpStyle -> Parser c -> Parser (CLIArgs c)
+argParserWith
+  :: HelpStyle
+  -- ^ help style
+  -> Parser c
+  -- ^ command parser
+  -> Parser (CLIArgs c)
 argParserWith s cmdParser =
   CLIArgs
     <$> optional

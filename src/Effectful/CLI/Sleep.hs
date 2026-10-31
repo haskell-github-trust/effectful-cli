@@ -23,7 +23,12 @@ import Text.Printf (printf)
 -- | Sleep for the given number of milliseconds.
 --
 -- @since 0.1.0.0
-msleep :: IOE :> es => Logger :> es => Int -> Eff es ()
+msleep
+  :: IOE :> es
+  => Logger :> es
+  => Int
+  -- ^ milliseconds
+  -> Eff es ()
 msleep n = do
   logDebugN (T.pack (printf "sleeping for %dms" n))
   liftIO (threadDelay (n * 1000))
@@ -31,7 +36,12 @@ msleep n = do
 -- | Sleep for the given number of seconds.
 --
 -- @since 0.1.0.0
-sleep :: IOE :> es => Logger :> es => Int -> Eff es ()
+sleep
+  :: IOE :> es
+  => Logger :> es
+  => Int
+  -- ^ seconds
+  -> Eff es ()
 sleep n = do
   logDebugN (T.pack (printf "sleeping for %ds" n))
   liftIO (threadDelay (n * 1000000))
@@ -39,7 +49,12 @@ sleep n = do
 -- | Sleep until the given local time.
 --
 -- @since 0.1.0.0
-sleepUntil :: IOE :> es => Logger :> es => LocalTime -> Eff es ()
+sleepUntil
+  :: IOE :> es
+  => Logger :> es
+  => LocalTime
+  -- ^ wake-up time
+  -> Eff es ()
 sleepUntil t = do
   logInfoN (T.pack ("sleeping until " <> formatTime defaultTimeLocale "%R" t))
   now <- getLocalTime

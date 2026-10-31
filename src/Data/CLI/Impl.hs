@@ -76,7 +76,14 @@ plainHelpStyle = HelpStyle mempty mempty mempty mempty
 -- | Render a string with the selected style of a t'HelpStyle'.
 --
 -- @since 0.2.2.0
-styled :: (HelpStyle -> AnsiStyle) -> HelpStyle -> String -> Doc
+styled
+  :: (HelpStyle -> AnsiStyle)
+  -- ^ style selector, e.g. '_styleValue'
+  -> HelpStyle
+  -- ^ style set to select from
+  -> String
+  -- ^ text to render
+  -> Doc
 styled f s
   | f s == mempty = pretty
   | otherwise = annotate (f s) . pretty
@@ -94,7 +101,10 @@ colorEnabled = do
 -- 'colorEnabled' is false.
 --
 -- @since 0.2.2.0
-execCLIParser :: ParserInfo a -> IO a
+execCLIParser
+  :: ParserInfo a
+  -- ^ top-level parser, e.g. from 'usage'
+  -> IO a
 execCLIParser pinfo = do
   c <- colorEnabled
   res <- execParserPure (prefs showHelpOnEmpty) pinfo <$> getArgs
@@ -108,13 +118,21 @@ execCLIParser pinfo = do
 -- | Error for 'succ' called on 'maxBound' of the named enum.
 --
 -- @since 0.1.0.0
-unboundEnumError :: String -> a
+unboundEnumError
+  :: String
+  -- ^ enum type name
+  -> a
 unboundEnumError name = error (printf "%s.Enum: succ invoked on maxBound" name)
 
 -- | Turn a megaparsec parser into a 'ReadM', requiring the whole input to be consumed.
 --
 -- @since 0.1.0.0
-fromParsec :: String -> Parsec Void String a -> ReadM a
+fromParsec
+  :: String
+  -- ^ input name used in parse error messages
+  -> Parsec Void String a
+  -- ^ parser for the whole value
+  -> ReadM a
 fromParsec name p = eitherReader (first errorBundlePretty . runParser (p <* eof) name)
 
 -- | Accept a value either as a positional argument or as a @-c@/@--name@ option.
@@ -122,10 +140,15 @@ fromParsec name p = eitherReader (first errorBundlePretty . runParser (p <* eof)
 -- @since 0.1.0.0
 argOrOpt
   :: String
+  -- ^ long option name, also the uppercased metavar
   -> Char
+  -- ^ short option
   -> String
+  -- ^ help text
   -> Either (Parsec Void String a) (ReadM a)
+  -- ^ value reader, as a megaparsec parser or a 'ReadM'
   -> [String]
+  -- ^ shell completion candidates
   -> Parser a
 argOrOpt name c h p cs =
   argument r (metavar var <> completeWith cs)
@@ -137,7 +160,10 @@ argOrOpt name c h p cs =
 -- | Parser for a command that takes no arguments.
 --
 -- @since 0.1.0.0
-noArgs :: a -> Parser a
+noArgs
+  :: a
+  -- ^ command value
+  -> Parser a
 noArgs = pure
 
 -- | @-f@/@--force@ switch.
@@ -160,7 +186,14 @@ noopSwitch = switch (short 'n' <> long "noop" <> help "do not perform any real a
 -- | @--name@/@--no-name@ switch pair; the last occurrence wins, otherwise the default.
 --
 -- @since 0.2.2.0
-reversibleSwitch :: Bool -> String -> String -> Parser Bool
+reversibleSwitch
+  :: Bool
+  -- ^ default when neither switch is given
+  -> String
+  -- ^ long switch name, @no-@ prefixed for the negation
+  -> String
+  -- ^ help text
+  -> Parser Bool
 reversibleSwitch def name h =
   last
     <$> some (flag' True (long name <> help h) <|> flag' False (long ("no-" <> name) <> hidden))
@@ -175,26 +208,56 @@ uuidArg = argOrOpt "uuid" 'u' "target uuid" (Right (maybeReader UUID.fromString)
 -- | Build a subcommand from a 'Command' instance.
 --
 -- @since 0.1.0.0
-mkCommand :: Command c e a => a -> Mod CommandFields a
+mkCommand
+  :: Command c e a
+  => a
+  -- ^ command value
+  -> Mod CommandFields a
 mkCommand a = command (cmdname a) (info (parser a) (progDesc (doc a)))
 
 -- | Build subcommands for every value of an enum, sorted by name and wrapped with the given constructor.
 --
 -- @since 0.1.0.0
 mkCommands
-  :: Bounded a => Command c e a => Command c e b => Enum a => (a -> b) -> Mod CommandFields b
+  :: Bounded a
+  => Command c e a
+  => Command c e b
+  => Enum a
+  => (a -> b)
+  -- ^ wrapping constructor
+  -> Mod CommandFields b
 mkCommands f = foldMap (mkCommand . f) (sortOn cmdname [minBound ..])
 
 -- | Top-level t'ParserInfo' with @--help@ and a header showing name, description and version.
 --
 -- @since 0.1.0.0
-usage :: String -> String -> String -> Parser a -> ParserInfo a
+usage
+  :: String
+  -- ^ program name
+  -> String
+  -- ^ version
+  -> String
+  -- ^ description
+  -> Parser a
+  -- ^ arguments parser
+  -> ParserInfo a
 usage = usageWith defaultHelpStyle
 
 -- | 'usage' with a custom t'HelpStyle'.
 --
 -- @since 0.2.2.0
-usageWith :: HelpStyle -> String -> String -> String -> Parser a -> ParserInfo a
+usageWith
+  :: HelpStyle
+  -- ^ help style
+  -> String
+  -- ^ program name
+  -> String
+  -- ^ version
+  -> String
+  -- ^ description
+  -> Parser a
+  -- ^ arguments parser
+  -> ParserInfo a
 usageWith s name version hdr p =
   info
     (p <**> helper)

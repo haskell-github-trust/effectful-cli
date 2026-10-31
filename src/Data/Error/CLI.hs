@@ -25,7 +25,10 @@ data CLIError
 -- | Render a 'CLIError' as a human-readable message.
 --
 -- @since 0.1.0.0
-displayCLIError :: CLIError -> Text
+displayCLIError
+  :: CLIError
+  -- ^ error to render
+  -> Text
 displayCLIError (InputError s) = "input error: " <> s
 displayCLIError (NotFoundError s) = "not found: " <> s
 displayCLIError (NotImplemented s) = "not implemented: " <> s
