@@ -1,3 +1,9 @@
+## [2.4.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.3.0...2.4.0) (2026-10-31)
+
+### Features
+
+* make default command print help ([4968cc4](https://github.com/haskell-github-trust/effectful-cli/commit/4968cc4866b941b12c26fda3ad98eef30f9d8ae3))
+
 ## [2.3.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.2.0...2.3.0) (2026-10-28)
 
 ### Features
