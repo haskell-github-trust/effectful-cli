@@ -1,3 +1,5 @@
+## [2.4.1](https://github.com/haskell-github-trust/effectful-cli/compare/2.4.0...2.4.1) (2026-10-31)
+
 ## [2.4.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.3.0...2.4.0) (2026-10-31)
 
 ### Features
