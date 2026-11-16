@@ -1,3 +1,9 @@
+## [2.9.3](https://github.com/haskell-github-trust/effectful-cli/compare/2.9.2...2.9.3) (2026-11-16)
+
+### Bug Fixes
+
+* switch stackage to nightly ([5aca652](https://github.com/haskell-github-trust/effectful-cli/commit/5aca652961378c9e22957a397ecc83ab8624ca4f))
+
 ## [2.9.2](https://github.com/haskell-github-trust/effectful-cli/compare/2.9.1...2.9.2) (2026-11-13)
 
 ### Bug Fixes
