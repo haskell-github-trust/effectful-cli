@@ -1,12 +1,13 @@
-snapshot: lts-24.64
+snapshot: nightly-2026-10-20
 
 packages:
 - .
 
 extra-deps:
 - http-client-effectful-1.0.0
-- hs-opentelemetry-instrumentation-monad-logger-1.0.0.0
-- hs-opentelemetry-api-1.0.0.0
-- hs-opentelemetry-api-types-1.0.0.0
-- hs-opentelemetry-semantic-conventions-1.40.0.0
-- thread-utils-context-0.4.1.1
+
+# http-client-effectful-1.0.0 caps effectful < 2.7 and http-client-tls < 0.4;
+# the nightly ships newer, and pinning older ones cascades into the TLS stack
+allow-newer: true
+allow-newer-deps:
+- http-client-effectful

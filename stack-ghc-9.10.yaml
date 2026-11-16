@@ -1,0 +1,12 @@
+snapshot: lts-24.64
+
+packages:
+- .
+
+extra-deps:
+- http-client-effectful-1.0.0
+- hs-opentelemetry-instrumentation-monad-logger-1.0.0.0
+- hs-opentelemetry-api-1.0.0.0
+- hs-opentelemetry-api-types-1.0.0.0
+- hs-opentelemetry-semantic-conventions-1.40.0.0
+- thread-utils-context-0.4.1.1

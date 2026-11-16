@@ -47,10 +47,10 @@ jobs:
 
         include:
           - ghc: 9.10.3
-            stack-yaml: stack.yaml
+            stack-yaml: stack-ghc-9.10.yaml
 
           - ghc: 9.12.4
-            stack-yaml: stack-ghc-9.12.yaml
+            stack-yaml: stack.yaml
 
     env:
       STACK_YAML: ${{ matrix.stack-yaml }}
