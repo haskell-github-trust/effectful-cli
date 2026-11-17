@@ -2,6 +2,7 @@
 module Effectful.CLI.Sleep (
   msleep,
   sleep,
+  sleepFor,
   sleepUntil,
 ) where
 
@@ -10,6 +11,7 @@ import Control.Monad.Logger (logDebugN, logInfoN)
 import Data.Text qualified as T
 import Data.Time (
   LocalTime,
+  NominalDiffTime,
   defaultTimeLocale,
   diffLocalTime,
   formatTime,
@@ -58,4 +60,14 @@ sleepUntil
 sleepUntil t = do
   logInfoN (T.pack ("sleeping until " <> formatTime defaultTimeLocale "%R" t))
   now <- getLocalTime
-  sleep . ceiling . nominalDiffTimeToSeconds $ diffLocalTime t now
+  sleepFor (diffLocalTime t now)
+
+-- | Sleep for the given duration.
+sleepFor
+  :: IOE :> es
+  => Logger :> es
+  => NominalDiffTime
+  -> Eff es ()
+sleepFor d = do
+  logDebugN (T.pack ("sleeping for " <> show d))
+  liftIO (threadDelay (max 0 (ceiling (nominalDiffTimeToSeconds d * 1000000))))
