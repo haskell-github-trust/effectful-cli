@@ -63,6 +63,8 @@ sleepUntil t = do
   sleepFor (diffLocalTime t now)
 
 -- | Sleep for the given duration.
+--
+-- @since 0.2.10.0
 sleepFor
   :: IOE :> es
   => Logger :> es

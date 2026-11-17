@@ -86,6 +86,7 @@ Effectful.CLI.IO.resolveIndex
 Effectful.CLI.IO.withConfirm
 Effectful.CLI.Sleep.msleep
 Effectful.CLI.Sleep.sleep
+Effectful.CLI.Sleep.sleepFor
 Effectful.CLI.Sleep.sleepUntil
 Effectful.CLI.Time.getBeginningOfDay
 Effectful.CLI.Time.getBeginningOfDayIO

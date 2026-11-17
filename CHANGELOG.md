@@ -1,3 +1,9 @@
+## [2.10.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.9.3...2.10.0) (2026-11-17)
+
+### Features
+
+* add `sleepFor` timedelta-based util ([6ad6747](https://github.com/haskell-github-trust/effectful-cli/commit/6ad67475396303e3f38ea3eb1ebe8160966e365e))
+
 ## [2.9.3](https://github.com/haskell-github-trust/effectful-cli/compare/2.9.2...2.9.3) (2026-11-16)
 
 ### Bug Fixes
