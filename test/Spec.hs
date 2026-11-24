@@ -171,6 +171,14 @@ main = hspec $ do
         Left (InputError m) -> "sec is a section, set one of: sec.x, sec.y" `isInfixOf` show m
         _ -> False
 
+    it "sets a key in a section missing required keys" $ do
+      path <- (</> "effectful-cli-config-partial-test.toml") <$> getTemporaryDirectory
+      r <- runEff . runErrorNoCallStack @CLIError $ do
+        setConfigKey @Section [] path "sec.y" "1"
+        getConfigKey path "sec.y"
+      removeFile path
+      r `shouldBe` Right "1"
+
     it "shows defaults for a missing file and file values over them" $ do
       dir <- getTemporaryDirectory
       let missing = dir </> "effectful-cli-config-missing.toml"

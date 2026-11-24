@@ -14,6 +14,7 @@ module Effectful.CLI.Config (
 
 import Control.Monad ((<=<))
 import Data.Error.CLI (CLIError (..))
+import Data.List (isInfixOf)
 import Data.Map.Strict qualified as Map
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
@@ -82,7 +83,8 @@ getConfigKey path key =
   render v = T.show (prettyValue v)
 
 -- | Set a dotted key to 'parseValue' of the raw input, creating intermediate
--- tables; the file is only written if the result still decodes as @a@.
+-- tables; the file is only written if the result still decodes as @a@,
+-- ignoring missing required keys.
 -- Re-renders the whole file, dropping comments and formatting.
 --
 -- When decoding fails and @key@ is a section of one of the known keys, the
@@ -106,14 +108,18 @@ setConfigKey known path key raw = do
     either (throwError . InputError) pure . setKey (T.splitOn "." key) (parseValue raw)
       =<< readTable path
   let rendered = T.show (prettyToml table)
-  case Toml.decode @a rendered of
-    Failure es ->
-      throwError
-        (InputError ("invalid config: " <> T.stripEnd (T.pack (unlines es)) <> sectionHint))
-    Success _ _ -> liftIO $ do
+  case decodeErrors rendered of
+    [] -> liftIO $ do
       createDirectoryIfMissing True (takeDirectory path)
       T.writeFile path rendered
+    es ->
+      throwError
+        (InputError ("invalid config: " <> T.stripEnd (T.pack (unlines es)) <> sectionHint))
  where
+  -- missing required keys are tolerated so sections can be filled one key at a time
+  decodeErrors r = case Toml.decode @a r of
+    Failure es -> filter (not . isInfixOf "missing key: ") es
+    Success _ _ -> []
   sectionHint = case filter (T.isPrefixOf (key <> ".")) known of
     [] -> ""
     ks -> "; " <> key <> " is a section, set one of: " <> T.intercalate ", " ks
