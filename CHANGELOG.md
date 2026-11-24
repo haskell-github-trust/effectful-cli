@@ -1,3 +1,9 @@
+## [2.10.1](https://github.com/haskell-github-trust/effectful-cli/compare/2.10.0...2.10.1) (2026-11-24)
+
+### Bug Fixes
+
+* **set:** allow writing keys in unset sections with default values ([b238669](https://github.com/haskell-github-trust/effectful-cli/commit/b238669de85c7a0408e089ec78be89ceaa78bd9e))
+
 ## [2.10.0](https://github.com/haskell-github-trust/effectful-cli/compare/2.9.3...2.10.0) (2026-11-17)
 
 ### Features
